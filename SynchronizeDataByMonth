@@ -2,7 +2,7 @@ CREATE PROCEDURE [dbo].[SP_SYNC_VIN_CAMPAIGBOIL_TO_CS_PROMOTION]
 AS BEGIN
 SET NOCOUNT ON;
 Declare @Source nvarchar (100)='CAMPAIGNOIL'
-Declare @Promo int =103059;
+Declare @Promo int =1;
 
 WITH 
 	CTE1 AS (
