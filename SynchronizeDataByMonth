@@ -1,0 +1,36 @@
+CREATE PROCEDURE [dbo].[SP_SYNC_VIN_CAMPAIGBOIL_TO_CS_PROMOTION]
+AS BEGIN
+SET NOCOUNT ON;
+Declare @Source nvarchar (100)='NO-SHOW-365D'
+Declare @Promo int =103059;
+
+WITH 
+	CTE1 AS (
+	SELECT VIN
+	FROM CampaignByVin
+	WHERE Source =@Source
+	),
+	CTE2 AS (
+	SELECT *
+	FROM UioPromotionDetail
+	WHERE PromoId =@Promo
+	)
+-- Start synchronize data between source and target
+INSERT INTO UioPromotionDetail (
+    CreationTime
+    ,CreatorUserId
+    ,IsDeleted
+    ,Vin,PromoId
+    ,IsReminded)
+SELECT 
+		GETDATE() 
+		,1 
+		,0 
+		,A.VIN
+		,@Promo 
+		,0 
+	FROM CTE1 A
+	LEFT JOIN CTE2 B ON A.Vin=B.Vin 
+	WHERE B.Vin is NULL
+
+END 
