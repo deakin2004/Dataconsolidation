@@ -1,13 +1,6 @@
-USE [UAT_TEST]
-GO
-/****** Object:  StoredProcedure [dbo].[SP_Consolidates_Formats_Data_New]    Script Date: 6/30/2025 11:58:16 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-ALTER PROCEDURE [dbo].[SP_Consolidates_Formats_Data_New]
+CREATE PROCEDURE [dbo].[SP_Consolidates_Formats_Data]
 AS
--- Exec SP_Consolidates_Formats_Data_New
+-- Exec SP_Consolidates_Formats_Data
 BEGIN
     SET NOCOUNT ON;
 
