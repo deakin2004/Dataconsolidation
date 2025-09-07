@@ -1,0 +1,49 @@
+ALTER PROCEDURE [dbo].[SP_GENERATE_COUPON_CAMPAIGN] 
+	-- Add the parameters for the stored procedure here
+
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+    -- Insert statements for procedure here
+	
+	-- 1. Declare the cursor
+	DECLARE Coupon_CS CURSOR LOCAL FOR
+		SELECT crm.Vinno,cam.Coupon --,crm.CountOfFullPM
+		FROM (
+			select Vinno , count(*) as [CountOfFullPM]
+			from [dbo].[crmkpiro] 
+			where [IsFullMaintenanceConfirmed]=1 AND isnull( isdeleted,0) = 0
+			group by Vinno
+			having count(*)>1
+		) crm  
+		LEFT JOIN [dbo].[srvcampaignbyvin] cam
+		ON cam.vin=crm.vinno and cam.source='LOYALTY-PROG-2FULLPM'
+		WHERE cam.vin is null
+
+	-- 2. Open the cursor
+	OPEN Coupon_CS
+
+	-- 3. Fetch rows one at a time
+	DECLARE @coupon varchar(8)
+	DECLARE @vin varchar(17)
+	DECLARE @source varchar(50)='CAMPAIGN-2025';
+	
+	FETCH NEXT FROM Coupon_CS
+	INTO @vin, @coupon,@source
+
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SET @coupon='' --Genrate random coupon by using function
+		INSERT INTO srvcampaignbyvin (vin, Coupon, source)
+		VALUES (@Vin, @coupon, @source)
+
+		FETCH NEXT FROM Coupon_CS
+		INTO @vin, @coupon,@source
+	END
+
+	-- 4.Clean up cursor to release db memory cache due to degrade svr performance if large result sets
+	CLOSE Coupon_CS
+	DEALLOCATE Coupon_CS
+END
